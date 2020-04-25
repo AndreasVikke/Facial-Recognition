@@ -1,13 +1,15 @@
 # Facial-Recognition
 
-### Author
+### Authors
 Andreas Zoega Vikke
 https://andreasvikke.dk/
+Martin Eli Frederiksen
+https://github.com/MartinFrederiksen
 
 ### Description
-This project is for home automation with IKEA Trådfri Gateway. It's created to be used on a 7" Raspberry PI screen, which is located in the foyer.
+This project is a Facial Recognition libary which can be imported into other programs or run standalone form the Command-line.
 
-It's created in Python and is run with a flask server.
+It's created in Python and is run with the use of OpenCV and dlib
 
 ### Important external uses
 |Libary|Version|
@@ -24,7 +26,7 @@ It's created in Python and is run with a flask server.
 ![CLI Help](https://raw.githubusercontent.com/AndreasVikke/Facial-Recognition/master/images/readme/Console-Help.png)
 
 You can use this libary standalone in the command-line:
-```python 
+``` 
 $ python FacialRecognition.py PATH
 ```
 Replace **PATH** with an image or video path.
@@ -34,13 +36,13 @@ Press **Q** to close the CLI
 
 ### Examples of commands in the stand-alone prompt:
 Get webcam output with Facial Recogniton:
-```python
+```
 $ python FacialRecognition.py 1
 ```
 ![Webcam output](https://raw.githubusercontent.com/AndreasVikke/Facial-Recognition/master/images/readme/webcam.gif)
 
 Get faces on image with features and tolerance at 0.62:
-```python
+```
 $ python FacialRecognition.py PATH -f=True -t=0.62
 ```
 ![Image with features](https://raw.githubusercontent.com/AndreasVikke/Facial-Recognition/master/images/readme/FredVikke.png)
