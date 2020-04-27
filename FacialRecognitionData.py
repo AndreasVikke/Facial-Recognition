@@ -18,6 +18,9 @@ face_recognition_model = "./models/dlib_face_recognition_resnet_model_v1.dat"
 pose_predictor_68_point = dlib.shape_predictor(predictor_68_point_model)
 face_encoder = dlib.face_recognition_model_v1(face_recognition_model)
 
+predictor_eyes_point_model = "./custom_models/eye_predictor.dat"
+pose_predictor_eyes_point = dlib.shape_predictor(predictor_eyes_point_model)
+
 
 def _rect_to_cords(rect):
     """
@@ -71,6 +74,34 @@ def _faces_landmarks_data(image, face_locations=None):
 
     return [pose_predictor_68_point(image, face_location) for face_location in face_locations]
 
+def _faces_landmarks_data_eyes(image, face_locations=None):
+    """
+        Returns raw landmarks of all faces in image (68 points pr. face)
+
+        :param image: image to find face landmarks in
+        :param face_locations: Optionally faces locations to get landmarks from
+    """
+    if face_locations == None:
+        face_locations = [_cords_to_rect(location) for location in face_location_data(image)]
+    else:
+        face_locations = [_cords_to_rect(location) for location in face_locations]
+
+    return [pose_predictor_eyes_point(image, face_location) for face_location in face_locations]
+
+def _faces_landmarks_data(image, face_locations=None):
+    """
+        Returns raw landmarks of all faces in image (68 points pr. face)
+
+        :param image: image to find face landmarks in
+        :param face_locations: Optionally faces locations to get landmarks from
+    """
+    if face_locations == None:
+        face_locations = [_cords_to_rect(location) for location in face_location_data(image)]
+    else:
+        face_locations = [_cords_to_rect(location) for location in face_locations]
+
+    return [pose_predictor_68_point(image, face_location) for face_location in face_locations]
+
 def faces_landmarks_dict(image, face_locations=None):
     """
         Returns a dictionary of all face featues given an image of all faces in image
@@ -81,7 +112,7 @@ def faces_landmarks_dict(image, face_locations=None):
 
     landmarks = _faces_landmarks_data(image, face_locations)
     landmarks_as_tuples = [[(p.x, p.y) for p in landmark.parts()] for landmark in landmarks]
-
+    
     return [{
             "chin": points[0:17],
             "left_eyebrow": points[17:22],
