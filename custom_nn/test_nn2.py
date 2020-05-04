@@ -33,7 +33,7 @@ face_images = json.load(open("images_files.json"))
 
 def get_images():
     cropped_images =[]
-    for idx, face_image in enumerate(face_images[0:200]):
+    for idx, face_image in enumerate(face_images[0:10]):
         image = cv2.imread('../custom_models/ibug_300W_large_face_landmark_dataset/' + face_image['file'])
         t = face_image['t']
         l = face_image['l']
@@ -65,7 +65,7 @@ def get_images2():
 
 def get_images3():
     cropped_images =[]
-    for idx, face_image in enumerate(face_images[10:15]):
+    for idx, face_image in enumerate(face_images[10:20]):
         image = cv2.imread('../custom_models/ibug_300W_large_face_landmark_dataset/' + face_image['file'])
         t = face_image['t']
         l = face_image['l']

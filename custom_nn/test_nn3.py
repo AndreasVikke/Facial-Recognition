@@ -20,7 +20,7 @@ def feed_forward(neural_network, input_vector):
         output = [neuron_output(neuron, input_with_bias)   # compute the output
             for neuron in layer]                           # for each neuron
         outputs.append(output)                             # and remember it
-        
+    
         # then the input to the next layer is the output of this one
         input_vector = output
     return outputs
@@ -66,21 +66,21 @@ from tqdm import tqdm
 random.seed(0)   # to get repeatable results
 input_size = 50*50  # each input is a vector of length 25 (5x5 "pixels")
 
-num_hidden = 5   # we'll have 5 neurons in the hidden layer
-output_size = 10 # we need 10 outputs for each input
+num_hidden_neurons = 5   # we'll have 5 neurons in the hidden layer
+output_size = 2 # we need 2 outputs for each input
 
 # each hidden neuron has one weight per input, plus a bias weight
-hidden_layer = [[random.random() for _ in range(input_size + 1)]
-                 for _ in range(num_hidden)]
-#print(hidden_layer)
+hidden_layer1 = [[random.random() for _ in range(input_size + 1)]
+                 for _ in range(num_hidden_neurons)]
+# print(hidden_layer)
 
 # each output neuron has one weight per hidden neuron, plus a bias weight
-output_layer = [[random.random() for _ in range(num_hidden + 1)]
+output_layer = [[random.random() for _ in range(num_hidden_neurons + 1)]
                  for _ in range(output_size)]
 #print(output_layer)
 
 # the network starts out with random weights, one hidden layer and one output layer
-network = [hidden_layer, output_layer]
+network = [hidden_layer1, output_layer]
 
 
 import test_nn2 as tnn
@@ -93,37 +93,36 @@ for image in images:
         for pixel in row:
             i.append(pixel)
     inputs.append(i)
+images = tnn.get_images3()
+for image in images:
+    i = []
+    for row in image:
+        for pixel in row:
+            i.append(pixel)
+    inputs.append(i)
 #print(inputs)
 
-targets = [[0 for j in range(10)] for i in inputs]
+targets = [[1, 0] if idx < 10 else [0,1] for idx, i in enumerate(inputs)] # 1 = Face, 0 = No Face
+print(targets)
 
 print('Training...')
 
 # 10,000 iterations seems enough to converge
 def loop(n):
-    for input_vector, target_vector in zip(inputs, targets): # inputs is a matrix of 10x25 (ten digits by 25 pixels), target is a one-hot encoded matrix of 10x10 (10 digits by 10 indices where each row has only 1 one and 9 zeroes)
-        backpropagate(network, input_vector, target_vector)
-
+    for i in tqdm(range(10000)):
+        for input_vector, target_vector in zip(inputs, targets): # inputs is a matrix of 10x25 (ten digits by 25 pixels), target is a one-hot encoded matrix of 10x10 (10 digits by 10 indices where each row has only 1 one and 9 zeroes)
+            backpropagate(network, input_vector, target_vector)
 
 from multiprocessing import Pool
 
 def predict(in_put):
     return feed_forward(network, in_put)[-1]
 
-with Pool(4) as p:
-      r = list(tqdm(p.imap(loop, range(10000)), total=10000))
-
+loop(10)
+# with Pool(8) as p:
+#       r = list(tqdm(p.imap(loop, range(10000)), total=10000))
 
 images = tnn.get_images2()
-inputs2 = []
-for image in images:
-    i = []
-    for row in image:
-        for pixel in row:
-            i.append(pixel)
-    inputs2.append(i)
-
-images = tnn.get_images3()
 inputs3 = []
 for image in images:
     i = []
@@ -132,9 +131,7 @@ for image in images:
             i.append(pixel)
     inputs3.append(i)
 
-
-
-for test_data in inputs3:
+for test_data in inputs:
     result = predict(test_data)
     result = np.array(result)
     print(result)
