@@ -4,6 +4,7 @@ from tqdm import tqdm
 import numpy as np
 import json
 import cv2
+import skimage.filters
 
 path = '../custom_models/ibug_300W_large_face_landmark_dataset/helen/trainset/2652699508_1.jpg'
 
@@ -14,25 +15,20 @@ kernel = [
     [1, 2, 1]
 ]
 
-def convolution_layer(image):
-    # pool = Pool(8)
-    # # convo_image = pool.map(convolute_cords, range(len(image[0]) - 2))
-    # convo_image = pool.map(convolute_cords, [(x, image) for x in range(len(image[0]))])
-    # pool.close()
-    # pool.join()
+def convolution_layer(image, kern):
     convo_image = []
     for x in range(len(image[0])):
-        convo_image.append(convolute_cords((x, image)))
-
-    return np.array(relu_layer(convo_image, len(image[0])))
+        convo_image.append(convolute_cords((x, image, kern)))
+    return np.array(convo_image, dtype=np.uint8)
+    # return np.array(relu_layer(convo_image, len(image[0])), dtype=np.uint8)
 
 def convolute_cords(args):
-    x, image = args
+    x, image, kern = args
     row = []
     for y in range(len(image[0]) - 2):
         snippet = image[x:x+feature_size, y:y+feature_size]
-        multiply = np.array([np.array(a, dtype=np.int16) * np.array(kernel[idx], dtype=np.int16) for idx, a in enumerate(snippet)])
-        res = sum(sum(multiply)) / len(image[0])
+        multiply = np.array([np.array(a, dtype=np.int16) * np.array(kern[idx], dtype=np.int16) for idx, a in enumerate(snippet)])
+        res = sum(sum(multiply))
         row.append(res)
     return row
 
@@ -43,8 +39,8 @@ def relu_layer(image, width):
         for y in range(width - 2):
             row.append(_relu(image[y][x]))
         relu_image.append(row)
-    # return relu_image
-    return pooling_layer(relu_image, len(relu_image[0]))
+    return np.array(relu_image, dtype=np.uint8)
+    # return pooling_layer(relu_image, len(relu_image[0]))
 
 def _relu(n):
     if n < 0:
@@ -85,14 +81,16 @@ def get_images(n):
     cropped_image = cv2.cvtColor(cropped_image, cv2.COLOR_BGR2GRAY)
     cropped_image = cv2.resize(cropped_image, (200, 200))
 
-    return convolution_layer(convolution_layer(cropped_image))
+    # return convolution_layer(convolution_layer(cropped_image))
 
 def test():
-    pool = Pool(8)
-    images = list(tqdm(pool.imap(get_images, range(50)), total=50))
+    pool = Pool(16)
+    images = list(tqdm(pool.imap(get_images, range(500)), total=500))
     pool.close()
     pool.join()
 
     print([len(image) for image in images])
 
-test()
+# test()
+
+
